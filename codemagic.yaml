@@ -10,13 +10,10 @@ workflows:
       - name: Reorganize project structure
         script: |
           mkdir -p app_backup
-          # نقل كل شيء إلى مجلد مؤقت ما عدا ملفات الإعدادات الأساسية
           find . -maxdepth 1 ! -name '.' ! -name 'app_backup' ! -name 'package.json' ! -name 'package-lock.json' ! -name 'codemagic.yaml' ! -name 'next.config.ts' ! -name 'next.config.js' ! -name 'tsconfig.json' ! -name '.gitignore' ! -name '.git' -exec mv {} app_backup/ \;
-          # إنشاء مجلد app ونقل ملفات التصميم والصفحات إليه
           mkdir -p app
           mv app_backup/* app/ 2>/dev/null || true
           rm -rf app_backup
-          # إنشاء صفحة رئيسية افتراضية في حال لم تكن موجودة لتجنب الخطأ
           if [ ! -f app/page.tsx ] && [ ! -f app/page.js ]; then
             echo 'export default function Page() { return <div>Arabex App</div> }' > app/page.tsx
           fi
@@ -25,4 +22,4 @@ workflows:
           npm install
       - name: Build Next.js site
         script: |
-          npx next build --no-lint
+          NEXT_DISABLE_ESLINT=1 npm run build
